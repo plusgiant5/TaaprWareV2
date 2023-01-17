@@ -1,11 +1,11 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TaaprWare2", "Hax\Hax.vcxproj", "{E6DE0105-06E7-43C4-A9A8-80FB888D6ECC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaaprWare2-UI", "..\TaaprWare2\TaaprWare2-UI\TaaprWare2-UI.csproj", "{7631001F-BBE2-4FD4-AB1E-8B8C6E2CBF0D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaaprWare2-UI", "TaaprWare2-UI\TaaprWare2-UI.csproj", "{7631001F-BBE2-4FD4-AB1E-8B8C6E2CBF0D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
