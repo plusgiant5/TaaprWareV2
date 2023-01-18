@@ -252,7 +252,7 @@ void on_inject() {
     std::vector<std::shared_ptr<objects::job>> jobs = get_jobs();
     // Bypassing memcheck by making every job think the memory is unchanged (because it is when their checks run)
     move_job(jobs, XorString("US14116"), 0); // This job is hooked and reverts the patches as if nothing happened
-    move_job(jobs, XorString("WaitingHybridScriptsJob"), 1); // This job is hooked and brings the patches back
+    //move_job(jobs, XorString("WaitingHybridScriptsJob"), 1); // This job is hooked and brings the patches back edit: no need to hook this as its always after and messes things up
     for (std::shared_ptr<objects::job> job : jobs) {
         printf(XorString("Job %p: %s\n"), job.get(), job.get()->name.c_str());
     }
