@@ -10,6 +10,7 @@ Discord (better exploits soon): https://discord.gg/nAEHrW9EF9
 # How to build
 
 DLL: Set to Release x86 and turn off precompiled headers
+
 UI: Add reference to the AvalonEdit dll in the Release folder
 
 # About
