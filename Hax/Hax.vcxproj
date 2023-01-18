@@ -193,7 +193,6 @@
   <ItemGroup>
     <Library Include="lib\libzstd_static.lib" />
     <Library Include="lib\xxhash.lib" />
-    <Library Include="Luau/Luau.Analysis.lib" />
     <Library Include="Luau/Luau.Ast.lib" />
     <Library Include="Luau/Luau.CodeGen.lib" />
     <Library Include="Luau/Luau.Compiler.lib" />
