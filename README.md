@@ -17,3 +17,5 @@ The framework of custom functions was also done with very few addresses, needing
 This exploit is good for beginners who want to experiment with custom functions without finding every offset in existence.
 
 If you need help with addresses or offsets, join the Discord and I will help you.
+
+TO BUILD YOU NEED TO SET IT TO Release x86 AND YOU MAY NEED TO DISABLE Precompiled Headers OR CHANGE THE C AND C++ VERSIONS TO NEWEST
