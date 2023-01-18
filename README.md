@@ -1,10 +1,13 @@
 # TaaprWareV2
 
 This is an open source roblox executor with a custom DLL made in C++, and a UI made in C#.
+It features level 8 execution (or whatever level you want), custom functions, metamethod hooking (buggy), an autoexec folder, and a workspace folder.
+With the init script, it's very detectable because of the insecure hook that doesn't use newcclosure, but on the C++ side it's immune to simple detection methods that I realized while coding it. It doesn't trigger any 268/unexpected client behavior kicks, at least not at the time I'm writing this.
 
 Discord (better exploits soon): https://discord.gg/nAEHrW9EF9
 
 This exploit helped me get from C++ hello world programs to real Luau function recreation for Roblox and finding offsets, expect it to be messy.
+It heavily relies on the Lua init script to function properly.
 
 With a few edits, you can get execution working with only these addresses and no offets: rbx_getscheduler, rbx_addscript, rbx_runscript, rbx_deserializer_detour and rbx_deserializer_detour2
 Or, for the bare minimum (localscript level, no custom bytecode) rbx_getscheduler and rbx_runscript.
