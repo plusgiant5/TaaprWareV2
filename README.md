@@ -6,8 +6,8 @@ It's not very secure though. With the init script, it's easily detectable becaus
 
 Discord (better exploits soon): https://discord.gg/nAEHrW9EF9
 
-This exploit helped me get from C++ hello world programs to real Luau function recreation for Roblox and finding offsets, expect it to be messy.
-It heavily relies on the Lua init script to function properly.
+This entire exploit started as testing grounds for me to learn more, and it definitely helped me learn. It helped me get from C++ hello world programs to real Luau function recreation for Roblox and finding offsets, so expect it to be messy.
+It heavily relies on the Lua init script to function properly, and it uses RuntimeScriptService::RunScript to execute. This execution method was annoying to work with as there is no lua state involved. I had to hook a terrain function and have the Lua code call that function with arguments that tell the C++ code what to do with the lua state. It was a good learning experience, but I will not be using this execution method again.
 
 With a few edits, you can get execution working with only these addresses and no offets: rbx_getscheduler, rbx_addscript, rbx_runscript, rbx_deserializer_detour and rbx_deserializer_detour2
 Or, for the bare minimum (localscript level, no custom bytecode) rbx_getscheduler and rbx_runscript.
