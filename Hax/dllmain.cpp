@@ -1,4 +1,4 @@
-﻿// dllmain.cpp : Defines the entry point for the DLL application.
+// dllmain.cpp : Defines the entry point for the DLL application.
 #include <Windows.h>
 #include <stdio.h>
 #include <thread>
@@ -39,7 +39,7 @@ __declspec(naked) UINT addscript_hook() {
     *reinterpret_cast<patch_5*>(addresses::rbx_addscript) = old_addscript;
     VirtualProtect((void*)addresses::rbx_addscript, 5, original_protection, &original_protection);
     //printf(XorString("AddScript unhooked\n"));
-    __asm mov [esp + 0xC], execution_level;
+    __asm mov [esp + 0xC], execution_level; // wont change unless they change the args which wont happen in years
     //printf(XorString("Raised level to %d\n"), execution_level);
     __asm mov ecx, addscript_ecx_v;
     __asm jmp addresses::rbx_addscript;
@@ -51,6 +51,8 @@ int new_bytecode_len;
 const char* old_bytecode;
 int old_bytecode_len;
 bool deserializer_called = false;
+#define bytecodel_len_offset 0x78
+#define bytecode_offset 0x15C
 __declspec(naked) UINT deserializer_detour() {
     // Set the bytecode
     //printf(XorString("Deserializer detoured\n"));
@@ -63,20 +65,20 @@ __declspec(naked) UINT deserializer_detour() {
     new_bytecode = compiled.c_str();
     new_bytecode_len = compiled.size();
     __asm {
-        mov eax, [ebp - 0x164];
+        mov eax, [ebp - bytecode_offset];
         mov old_bytecode, eax;
-        mov eax, [ebp - 0x60];
+        mov eax, [ebp - bytecodel_len_offset];
         mov old_bytecode_len, eax;
     }
     //printf(XorString("Saved vanilla values\n"));
     __asm {
         mov eax, new_bytecode_len;
-        mov [ebp - 0x60], eax;
+        mov [ebp - bytecodel_len_offset], eax;
     }
     //printf(XorString("Set bytecode length to 0x%X\n"), new_bytecode_len);
     __asm {
         mov eax, new_bytecode;
-        mov [ebp - 0x164], eax;
+        mov [ebp - bytecode_offset], eax;
     }
     //printf(XorString("Set bytecode to %p\n"), new_bytecode);
     __asm jmp addresses::rbx_deserializer_detour;
@@ -92,12 +94,12 @@ __declspec(naked) UINT deserializer_detour_2() {
     //printf(XorString("Deserializer hashcheck unhooked\n"));
     __asm {
         mov eax, old_bytecode_len;
-        mov[ebp - 0x60], eax;
+        mov[ebp - bytecodel_len_offset], eax;
     }
     //printf(XorString("Loaded vanilla bytecode length (%d)\n"), old_bytecode_len);
     __asm {
         mov eax, old_bytecode;
-        mov[ebp - 0x164], eax;
+        mov[ebp - bytecode_offset], eax;
     }
     //printf("%p\n", (ULONG_PTR)__readfsdword(PcTeb));
     //printf(XorString("Loaded vanilla bytecode (%p)\n"), old_bytecode);
@@ -247,9 +249,12 @@ void move_job(std::vector<std::shared_ptr<objects::job>>& jobs, std::string job_
 void on_inject() {
     printf(XorString("Saving original bytes\n"));
     for (int offset = 0; offset < rbx_writevoxels_instsize; offset++) {
+        printf(XorString("%X + %d\n"), addresses::rbx_writevoxels, offset);
         original_writevoxels_bytes[offset] = *reinterpret_cast<BYTE*>(addresses::rbx_writevoxels + offset);
     }
+    printf(XorString("Getting jobs\n"));
     std::vector<std::shared_ptr<objects::job>> jobs = get_jobs();
+    printf(XorString("Moving AC job\n"));
     // Bypassing memcheck by making every job think the memory is unchanged (because it is when their checks run)
     move_job(jobs, XorString("US14116"), 0); // This job is hooked and reverts the patches as if nothing happened
     //move_job(jobs, XorString("WaitingHybridScriptsJob"), 1); // This job is hooked and brings the patches back edit: no need to hook this as its always after and messes things up
@@ -365,7 +370,7 @@ bool __stdcall DllMain(HMODULE hModule, unsigned int ul_reason_for_call, void* l
         freopen_s(&file_stream, XorString("CONIN$"), "r", stdin);
         freopen_s(&file_stream, XorString("CONOUT$"), "w", stdout);
         freopen_s(&file_stream, XorString("CONOUT$"), "w", stderr);
-        SetConsoleTitleA("TaaprWare V2 Internal");
+        SetConsoleTitleA("TaaprWare V2.4.4 Internal");
         printf(XorString("Hi\n"));
         unpatch_SetUnhandledExceptionFilter();
         printf(XorString("Unpatched SetUnhandledExceptionFilter %p\n"), SetUnhandledExceptionFilter);
