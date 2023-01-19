@@ -112,23 +112,22 @@ const UINT rbx_writevoxels_instsize = 13; // sum of length of instructions affec
 // instructions affected by placing a push ret (5 bytes) at rbx_writevoxels
 #define rbx_writevoxels_overwritten_instructions \
 	mov[ebp - 0x44], ecx; \
-	mov[ebp - 0x134], 0x38C2303C; 
+	mov[ebp - 0x134], 0x3246AE8; 
 namespace addresses {
-	define_address(rbx_printf, 0xC2B600); // tons of ways to get this
-	define_address(rbx_getscheduler, 0x716F10); // tons of ways to get this
-	define_address(rbx_addscript, 0x3AFBA0); // startscript's only xref (used for setting level)
-	define_address(rbx_runscript, 0x3BBD50); // xref addscript and check each one until a breakpoint hits (used for starting execution cycle)
-	define_address(rbx_deserializer_detour, 0x33F411); // after getbytecode in deserializer, right after the conditional (used for setting bytecode)
-	define_address(rbx_deserializer_detour_2, 0x33F3E5); // after getbytecode in deserializer, inside the conditional, after the label definition (used for hashcheck bypass)
-	define_address(rbx_writevoxels, 0xF6E110); // [MUST BE AFTER PROLOGUE] cause a Lua error in WriteVoxels to know how to find this
+	define_address(rbx_printf, 0xC2DCE0); // tons of ways to get this
+	define_address(rbx_getscheduler, 0x718F60); // tons of ways to get this
+	define_address(rbx_addscript, 0x3B04B0); // startscript's only xref (used for setting level)
+	define_address(rbx_runscript, 0x3BC530); // xref addscript and check each one until a breakpoint hits (used for starting execution cycle)
+	define_address(rbx_deserializer_detour, 0x340230); // after getbytecode in deserializer, right after the conditional (used for setting bytecode)
+	define_address(rbx_deserializer_detour_2, 0x340204); // after getbytecode in deserializer, inside the conditional, after the label definition (used for hashcheck bypass)
+	define_address(rbx_writevoxels, 0xF2BAA0); // [AFTER THE PROLOGUE] cause a Lua error in WriteVoxels to know how to find this
 
-	// Look at luau source for all of these
-	define_address(type_name, 0x13DEC90); //
-	define_address(pseudo2addr, 0x13DE050); //
-	define_address(luaO_nilobject, 0x246E3E0); //
+	// Look at Luau source for all of these
+	define_address(type_name, 0x13ECB30); // easiest Luau function "no value"
+	define_address(pseudo2addr, 0x13DE050); // literally just scroll down from type_name and you will 99% see a function that calls this lol
+	define_address(luaO_nilobject, 0x2482770); // the only pointer inside pseudo2addr
 
-	define_address(decompress, 0xC59840); // for custom funcs only, if you hook this you die irl
-	define_address(load, 0x33C250); // for loadstring only, also credit to Nezy-Exploit for the code involving this
+	define_address(load, 0x33D0E0); // aka LuaVM::load, for loadstring only, also credit to Nezy-Exploit for the code involving this
 }
 
 namespace types {
@@ -140,7 +139,6 @@ namespace types {
 	typedef const char*(__fastcall* type_name)(UINT rL, int type);
 	typedef void*(__fastcall* pseudo2addr)(UINT rL, int idx);
 
-	typedef UINT*(__fastcall* decompress)(int bytecode_len, UINT* bytecode, uint8_t memcat);
 	typedef UINT(__fastcall* load)(UINT rL, std::string* source, const char* chunkname, int env);
 }
 
@@ -156,7 +154,6 @@ namespace functions {
 		define_function(pseudo2addr);
 	}
 
-	define_function(decompress);
 	define_function(load);
 }
 
@@ -176,26 +173,26 @@ Offset Guide:
 // Don't get overwhelmed. None of these are required for base execution, and only top and base are required for __send_to_C
 namespace offsets {
 	namespace rCommonHeader {
-		define_offset(tt, 0x0, get_unencrypted, set_unencrypted); // 1
-		define_offset(marked, 0x1, get_unencrypted, set_unencrypted); // 1
-		define_offset(memcat, 0x2, get_unencrypted, set_unencrypted); // 1
+		// I don't know how GC works fully yet, I just know every object NEEDS this to cooperate with roblox properly
+		define_offset(tt, 0x2, get_unencrypted, set_unencrypted); // 1
+		define_offset(marked, 0x0, get_unencrypted, set_unencrypted); // 1
+		define_offset(memcat, 0x1, get_unencrypted, set_unencrypted); // 1
 	}
 	namespace rL {
 		define_offset(activememcat, 0x4, get_unencrypted, set_unencrypted); // 1
-		define_offset(top, 0x10, get_unencrypted, set_unencrypted); // 3
-		define_offset(base, 0x14, get_unencrypted, set_unencrypted); // 3
-		define_offset(global, 0x18, // 1, 2, 3
-			/* get */ return *(UINT*)(address_of_ptr) - address_of_ptr,
+		define_offset(top, 0x8, get_unencrypted, set_unencrypted); // 3
+		define_offset(base, 0x10, get_unencrypted, set_unencrypted); // 3
+		define_offset(global, 0xC, // 1, 2, 3, 5, 6, 7, 8
+			/* get */ return *(UINT*)(address_of_ptr) + address_of_ptr,
 			/* set */ );
-		define_offset(namecall, 0x44, get_unencrypted, set_unencrypted); // (getnamecallmethod) 8
-		define_offset(userdata, 0x48, get_unencrypted, set_unencrypted); // (aka extraspace) 5
+		define_offset(namecall, 0x44, get_unencrypted, set_unencrypted); // (getnamecallmethod) 8h
+		define_offset(userdata, 0x48, get_unencrypted, set_unencrypted); // (aka extraspace) 5h
 	}
 	namespace rG {
 		// rG->rstringtable isn't a pointer
-		// all unused for now
-		define_offset(strt_size, 0x8, get_unencrypted, set_unencrypted); // (unused) 1h
-		define_offset(strt_nuse, 0x4, get_unencrypted, set_unencrypted); // (unused) 1h
-		define_offset(strt_hash, 0x0, get_unencrypted, set_unencrypted); // (unused) 1h
+		//define_offset(strt_size, 0x8, get_unencrypted, set_unencrypted); // (unused) 1h
+		//define_offset(strt_nuse, 0x4, get_unencrypted, set_unencrypted); // (unused) 1h
+		//define_offset(strt_hash, 0x0, get_unencrypted, set_unencrypted); // (unused) 1h
 		define_offset(currentwhite, 0x14, get_unencrypted, set_unencrypted); // 1
 	}
 	namespace rTString {
@@ -204,33 +201,33 @@ namespace offsets {
 		define_offset(memcat, offsets::rCommonHeader::memcat, get_unencrypted, set_unencrypted);
 
 		define_offset(atom, 0x4, get_unencrypted, set_unencrypted); // 1
-		define_offset(next, 0x8, get_unencrypted, set_unencrypted); // (unused) 1
+		//define_offset(next, 0x8, get_unencrypted, set_unencrypted); // (unused) 1
 		define_offset(hash, 0xC, // 1
 			/* get */ return *(T*)(address_of_ptr) + address_of_ptr,
-			/* set */ *(T*)(address_of_ptr) = address_of_ptr - value);
+			/* set */ *(T*)(address_of_ptr) = value - address_of_ptr);
 		define_offset(len, 0x10, // 1
-			/* get */ return *(T*)(address_of_ptr) ^ address_of_ptr,
-			/* set */ *(T*)(address_of_ptr) = address_of_ptr ^ value);
+			/* get */ return *(T*)(address_of_ptr) - address_of_ptr,
+			/* set */ *(T*)(address_of_ptr) = address_of_ptr - value);
 		define_offset(data, 0x14, get_unencrypted, set_unencrypted); // (unchanging) 1
 	}
 	namespace rUdata {
-		define_offset(metatable, 0x8, // 6
-		/* get */ return *(T*)(address_of_ptr) ^ address_of_ptr,
-		/* set */ *(T*)(address_of_ptr) = address_of_ptr ^ value);
-		define_offset(data, 0x10, get_unencrypted, set_unencrypted); // (unchanging) 4
+		define_offset(metatable, 0x8, // 6h
+		/* get */ return address_of_ptr - *(T*)(address_of_ptr),
+		/* set */ *(T*)(address_of_ptr) = address_of_ptr - value);
+		define_offset(data, 0x10, get_unencrypted, set_unencrypted); // (unchanging) 4h
 	}
 	namespace rTable {
-		define_offset(readonly, 0x3, get_unencrypted, set_unencrypted); // (unchanging) 8
-		define_offset(metatable, 0x1C, // 6
-		/* get */ return *(T*)(address_of_ptr) ^ address_of_ptr,
-		/* set */ *(T*)(address_of_ptr) = address_of_ptr ^ value);
+		define_offset(readonly, 0x6, get_unencrypted, set_unencrypted); // (unchanging) 8h
+		define_offset(metatable, 0x1C, // 6h
+		/* get */ return address_of_ptr - *(T*)(address_of_ptr),
+		/* set */ *(T*)(address_of_ptr) = address_of_ptr - value);
 	}
 	namespace rextraspace {
 		define_offset(identity, 0x18, get_unencrypted, set_unencrypted);
 	}
 	namespace rPlayer {
-		define_offset(simulationradius, 0x1D0, get_unencrypted, set_unencrypted); // 4
-		define_offset(maximumsimulationradius, 0x1D4, get_unencrypted, set_unencrypted); // 4
+		define_offset(simulationradius, 0x1D0, get_unencrypted, set_unencrypted); // 4h
+		define_offset(maximumsimulationradius, 0x1D4, get_unencrypted, set_unencrypted); // 4h
 	}
 }
 inline UINT get_rL(UINT scriptcontext) {
