@@ -11,9 +11,9 @@
 /*
 Type 0: nil
 Type 1: boolean
-Type 2: userdata
-Type 3: number
-Type 4: vector
+Type 2: number
+Type 3: vector
+Type 4: userdata
 Type 5: string
 Type 6: thread
 Type 7: function
@@ -24,9 +24,9 @@ enum lua_Type {
     LUA_TNIL = 0,     // must be 0 due to lua_isnoneornil
     LUA_TBOOLEAN = 1, // must be 1 due to l_isfalse
 
-    LUA_TLIGHTUSERDATA,
     LUA_TNUMBER,
     LUA_TVECTOR,
+    LUA_TLIGHTUSERDATA,
 
     LUA_TSTRING, // all types above this must be value types, all types below this must be GC types - see iscollectable
 
