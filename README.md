@@ -13,6 +13,10 @@ DLL: Set to Release x86 and turn off precompiled headers
 
 UI: Add reference to the AvalonEdit dll in the Release folder
 
+# HttpGet/GetObjects hook
+
+Because of the way custom functions work, hooking metamethods causes a bunch of errors in the output which is annoying. If you want game:HttpGet and game:GetObjects capabilities and can handle the error spam, uncomment line 1380 in InitScript.lua.
+
 # About
 
 This entire exploit started as testing grounds for me to learn more, and it definitely helped me learn. It helped me get from C++ hello world programs to real Luau function recreation for Roblox and finding offsets, so expect it to be messy.
