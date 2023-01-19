@@ -112,7 +112,7 @@ local terrain = workspace.FindFirstChildOfClass(workspace, "Terrain")
 local WriteVoxels = terrain.WriteVoxels
 local function __send_to_C(message, ...)
 	-- no metamethods allowed
-    local returns = {WriteVoxels(terrain, ___hwidkey___ or "keynil", message, ...)}
+	local returns = {WriteVoxels(terrain, ___hwidkey___ or "keynil", message, ...)}
     if returns[1] == 9992 and type(returns[2]) == "string" then -- secret error code
         error(returns[2])
     else
@@ -582,7 +582,7 @@ local function ____hookmetamethod____taapr____internal____(object, method, func)
 	local old = metatable[method]
 	local hookedtick = __tick__()
 	setreadonly(metatable, false)
-	metatable[method] = function(...)
+	metatable[method] = func--[[function(...)
 		if __tick__() - hookedtick < 0.05 then -- random errors lol
 			return old(...)
 		end
@@ -600,7 +600,7 @@ local function ____hookmetamethod____taapr____internal____(object, method, func)
 		end
 		table_remove(rets, 1) -- pop the boolean "success" return
 		return __unpack__(rets) -- return ALL the returns of func
-	end
+	end]]
 	setreadonly(metatable, true)
 	--task_wait(0.1)
 	return old
@@ -666,11 +666,15 @@ setsimradius = setsimulationradius
 gethiddenproperty = function(instance, property)
     assert(typeof(instance) == "Instance", "invalid argument #1 to 'setsimulationradius' (Instance expected, got " .. typeof(instance) .. ") ", 2)
     assert(type(radius) == "number", "invalid argument #1 to 'setsimulationradius' (number expected, got " .. type(radius) .. ") ", 2)
-
+	if property == "SimulationRadius" or property == "MaximumSimulationRadius" then
+		return getsimulationradius()
+	end
 end
 gethiddenprop = gethiddenproperty
-sethiddenproperty = function(instance, property)
-
+sethiddenproperty = function(instance, property, value)
+	if property == "SimulationRadius" or property == "MaximumSimulationRadius" then
+		setsimulationradius(value)
+	end
 end
 sethiddenprop = sethiddenproperty
 
@@ -1373,7 +1377,7 @@ end
 
 -- hooks for extra functions, with extra long names because if you accidentally edited one of them it would break your client
 local ishooked = pcall(function()
-	return game:GetService("CoreGui")["[ishooked]"]
+	return --game:GetService("CoreGui")["[ishooked]"] -- Comment out everything after return to disable metamethod hook
 end)
 if not ishooked then
 	local function __self__httpget(self, ...)
@@ -1390,13 +1394,13 @@ if not ishooked then
 	end
 	__taapr__internal__old__index__function = ____hookmetamethod____taapr____internal____(game, "__index", function(self, key)
 		if self == game then
-			if checkcaller() then
+			--if checkcaller() then
 				if key == "HttpGet" then
 					return __self__httpget
 				elseif key == "GetObjects" then
 					return __self__getobjects
 				end
-			end
+			--end
 		elseif self == game.CoreGui then -- because devs cant put an instance called "[ishooked]" into here
 			if checkcaller() and key == "[ishooked]" then
 				return true
