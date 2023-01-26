@@ -1,7 +1,7 @@
 -- Credit: https://v3rmillion.net/showthread.php?tid=1075607
 -- Yielding in C functions freezes the game until done. I will solve this in another project.
 
-local doinit = false
+local doinit = true
 if doinit then
 
 local supported = {
