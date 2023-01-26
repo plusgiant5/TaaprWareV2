@@ -1,6 +1,9 @@
 -- Credit: https://v3rmillion.net/showthread.php?tid=1075607
 -- Yielding in C functions freezes the game until done. I will solve this in another project.
 
+local doinit = false
+if doinit then
+
 local supported = {
     "request",
     "newlclosure",
@@ -1377,7 +1380,7 @@ end
 
 -- hooks for extra functions, with extra long names because if you accidentally edited one of them it would break your client
 local ishooked = pcall(function()
-	return --game:GetService("CoreGui")["[ishooked]"] -- Comment out everything after return to disable metamethod hook
+	return game:GetService("CoreGui")["[ishooked]"] -- Comment out everything after return to disable metamethod hook
 end)
 if not ishooked then
 	local function __self__httpget(self, ...)
@@ -1435,4 +1438,6 @@ if not ishooked then
 	table.insert(__taapr__internal__namecall__hooklist, __taapr__internal__old__namecall__function)
 	task.wait(0.1) -- give metamethod hooks all the time in the world to activate
 	print("TaaprWare V2 init done! (ignore the following errors)")
+end
+
 end
