@@ -1,5 +1,7 @@
 # TaaprWare V2
 
+WARNING: This code is very bad and I don't know if it still works anymore. Future exploits by me will be nothing like this.
+
 This is an open source Roblox executor with a custom DLL made in C++, and a UI made in C#.
 It features level 8 execution (or whatever level you want), custom functions, metamethod hooking (breaks corescripts), multi Roblox injection, an autoexec folder, and a workspace folder.
 
