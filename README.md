@@ -1,3 +1,5 @@
+NEW WORKING VERSION: https://github.com/plusgiant5/TaaprWareV3
+
 # TaaprWare V2
 
 WARNING: This code is very bad and I don't know if it still works anymore. Future exploits by me will be nothing like this. It's not updated, but it's possible to update (even following the recent compression changes).
